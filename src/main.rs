@@ -63,28 +63,30 @@ fn mainloop(parsed: parser::Parsed) {
     let mut tape = Tape::new();
 
     for token in parsed.tokens.iter() {
-        if token == "Ook. Ook?" {
+        if token.eq("Ook. Ook?") {
             tape.advance();
-        } else if token == "Ook? Ook." {
+        } else if token.eq("Ook? Ook.") {
             tape.devance();
-        } else if token == "Ook. Ook." {
+        } else if token.eq("Ook. Ook.") {
             tape.inc();
-        } else if token == "Ook! Ook!" {
+        } else if token.eq("Ook! Ook!") {
             tape.dec();
-        } else if token == "Ook! Ook." {
+        } else if token.eq("Ook! Ook.") {
             // print
-            println!("{}", tape.get());
-            println!("{}", (tape.get() as u8) as char);
-        } else if token == "Ook. Ook!" {
+            //println!("{}", tape.get());
+            //println!("{}", (tape.get() as u8) as char);
+            tape.get();
+        } else if token.eq("Ook. Ook!") {
             let mut buffer = String::new();
             io::stdin().read_to_string(&mut buffer);
             tape.set(buffer.parse::<u64>().unwrap());
-        } else if token == "Ook! Ook?" && tape.get() == 0 {
+        } else if token.eq("Ook! Ook?") && tape.get() == 0 {
             pc = parsed.bracket_map[&pc];
-        } else if token == "Ook? Ook!" && tape.get() != 0 {
+        } else if token.eq("Ook? Ook!") && tape.get() != 0 {
             pc = parsed.bracket_map[&pc];
         }
         pc += 1;
+        //println!("{}", pc);
     }
 }
 
@@ -104,7 +106,7 @@ fn split(program: String) -> Vec<String> {
 
 fn parse(program: String) -> parser::Parsed {
     let tokens = split(program);
-
+    
     let mut parsed: Vec<String> = vec![];
     let mut bracket_map: HashMap<u64, u64> = HashMap::new();
     let mut leftstack: Vec<u64> = vec![];
