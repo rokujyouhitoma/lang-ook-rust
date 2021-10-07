@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::env;
 use std::fs::File;
-use std::io::prelude::*;
 use std::io::{self, Read};
 
 mod parser {
