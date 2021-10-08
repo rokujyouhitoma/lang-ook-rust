@@ -14,8 +14,8 @@ mod parser {
 }
 
 struct Tape {
-    position: u64,
-    thetape: Vec<u64>,
+    position: i64,
+    thetape: Vec<i64>,
 }
 
 impl Tape {
@@ -26,11 +26,11 @@ impl Tape {
         }
     }
 
-    fn get(&mut self) -> u64 {
+    fn get(&mut self) -> i64 {
         return self.thetape[self.position as usize];
     }
 
-    fn set(&mut self, val: u64) {
+    fn set(&mut self, val: i64) {
         self.thetape[self.position as usize] = val;
     }
 
@@ -39,28 +39,26 @@ impl Tape {
     }
 
     fn dec(&mut self) {
-        if self.thetape[self.position as usize] > 1 {
-            self.thetape[self.position as usize] -= 1;
-        }
+       self.thetape[self.position as usize] -= 1;
     }
 
     fn advance(&mut self) {
+        println!("advance: {} {}", self.position, self.thetape.len());
         self.position += 1;
-        if self.thetape.len() as u64 <= self.position {
+        if self.thetape.len() as i64 <= self.position {
             self.thetape.push(0);
         }
     }
 
     fn devance(&mut self) {
-        if self.position > 1 {
-            self.position -= 1;
-        }
+        self.position -= 1;
     }
 }
 
 fn mainloop(parsed: parser::Parsed) {
     let mut pc: u64 = 0;
     let mut tape = Tape::new();
+    println!("{}", parsed.tokens.len());
 
     for token in parsed.tokens.iter() {
         if token.eq("Ook. Ook?") {
@@ -79,14 +77,14 @@ fn mainloop(parsed: parser::Parsed) {
         } else if token.eq("Ook. Ook!") {
             let mut buffer = String::new();
             io::stdin().read_to_string(&mut buffer);
-            tape.set(buffer.parse::<u64>().unwrap());
+            tape.set(buffer.parse::<i64>().unwrap());
         } else if token.eq("Ook! Ook?") && tape.get() == 0 {
             pc = parsed.bracket_map[&pc];
         } else if token.eq("Ook? Ook!") && tape.get() != 0 {
             pc = parsed.bracket_map[&pc];
         }
         pc += 1;
-        //println!("{}", pc);
+        println!("{} {}", token, pc);
     }
 }
 
@@ -106,7 +104,7 @@ fn split(program: String) -> Vec<String> {
 
 fn parse(program: String) -> parser::Parsed {
     let tokens = split(program);
-    
+
     let mut parsed: Vec<String> = vec![];
     let mut bracket_map: HashMap<u64, u64> = HashMap::new();
     let mut leftstack: Vec<u64> = vec![];
