@@ -39,11 +39,11 @@ impl Tape {
     }
 
     fn dec(&mut self) {
-       self.thetape[self.position as usize] -= 1;
+        self.thetape[self.position as usize] -= 1;
     }
 
     fn advance(&mut self) {
-        println!("advance: {} {}", self.position, self.thetape.len());
+        //println!("advance: {} {}", self.position, self.thetape.len());
         self.position += 1;
         if self.thetape.len() as i64 <= self.position {
             self.thetape.push(0);
@@ -58,9 +58,11 @@ impl Tape {
 fn mainloop(parsed: parser::Parsed) {
     let mut pc: u64 = 0;
     let mut tape = Tape::new();
-    println!("{}", parsed.tokens.len());
+    //println!("{}", parsed.tokens.len());
 
-    for token in parsed.tokens.iter() {
+    while pc < parsed.tokens.len() as u64 {
+        let token = &parsed.tokens[pc as usize];
+
         if token.eq("Ook. Ook?") {
             tape.advance();
         } else if token.eq("Ook? Ook.") {
@@ -72,11 +74,10 @@ fn mainloop(parsed: parser::Parsed) {
         } else if token.eq("Ook! Ook.") {
             // print
             //println!("{}", tape.get());
-            //println!("{}", (tape.get() as u8) as char);
-            tape.get();
+            print!("{}", (tape.get() as u8) as char);
         } else if token.eq("Ook. Ook!") {
             let mut buffer = String::new();
-            io::stdin().read_to_string(&mut buffer);
+            let _ = io::stdin().read_to_string(&mut buffer);
             tape.set(buffer.parse::<i64>().unwrap());
         } else if token.eq("Ook! Ook?") && tape.get() == 0 {
             pc = parsed.bracket_map[&pc];
@@ -84,7 +85,7 @@ fn mainloop(parsed: parser::Parsed) {
             pc = parsed.bracket_map[&pc];
         }
         pc += 1;
-        println!("{} {}", token, pc);
+        //println!("{} {}", token, pc);
     }
 }
 
