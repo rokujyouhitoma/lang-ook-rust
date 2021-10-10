@@ -11,6 +11,17 @@ mod parser {
         pub tokens: Vec<String>,
         pub bracket_map: HashMap<u64, u64>,
     }
+
+    pub struct TokenSet<'a> {
+        pub advance: &'a String,    // ">", "Ook. Ook?"
+        pub devance: &'a String,    // "<", "Ook? Ook."
+        pub increment: String,      // "+", "Ook. Ook."
+        pub decrement: String,      // "-", "Ook! Ook!"
+        pub set: String,            // ",", "Ook. Ook!"
+        pub print: String,          // ".", "Ook! Ook."
+        pub jump_forward: String,   // "[", "Ook! Ook?"
+        pub jump_back: String,      // "]", "Ook? Ook!"
+    }
 }
 
 struct Tape {
@@ -99,7 +110,7 @@ fn split(program: String) -> Vec<String> {
     return tokens;
 }
 
-fn parse(program: String) -> parser::Parsed {
+fn parse(token_set: parser::TokenSet, program: String) -> parser::Parsed {
     let tokens = split(program);
 
     let mut parsed: Vec<String> = vec![];
@@ -108,15 +119,25 @@ fn parse(program: String) -> parser::Parsed {
 
     let mut pc: u64 = 0;
 
-    let instructions: HashSet<&'static str> = [
-        "Ook. Ook?",
-        "Ook? Ook.",
+    let instructions: HashSet<&str> = [
+        //     token_set.advance,
+        //     token_set.devance,
+        //     token_set.increment,
+        //     token_set.decrement,
+        //     token_set.set,
+        //     token_set.print,
+        //     token_set.jump_forward,
+        //     token_set.jump_back,
+        //"Ook. Ook?",
+        //"Ook? Ook.",
         "Ook. Ook.",
         "Ook! Ook!",
         "Ook. Ook!",
         "Ook! Ook.",
         "Ook! Ook?",
         "Ook? Ook!",
+        token_set.advance,
+        token_set.devance,
     ]
     .iter()
     .cloned()
@@ -151,11 +172,21 @@ fn parse(program: String) -> parser::Parsed {
 fn run(mut file: &File) {
     let mut contents = String::new();
     let res = file.read_to_string(&mut contents);
+    let token_set = parser::TokenSet {
+        advance: &String::from("Ook. Ook?"),
+        devance: &String::from("Ook? Ook."),
+        increment: String::from("Ook. Ook."),
+        decrement: String::from("Ook! Ook!"),
+        set: String::from("Ook. Ook!"),
+        print: String::from("Ook! Ook."),
+        jump_forward: String::from("Ook! Ook?"),
+        jump_back: String::from("Ook? Ook!"),
+    };
     match res {
         Err(e) => println!("{:?}", e),
         _ => (),
     }
-    let parsed = parse(contents);
+    let parsed = parse(token_set, contents);
     mainloop(parsed);
 }
 
