@@ -13,14 +13,14 @@ mod parser {
     }
 
     pub struct TokenSet<'a> {
-        pub advance: &'a String,    // ">", "Ook. Ook?"
-        pub devance: &'a String,    // "<", "Ook? Ook."
-        pub increment: String,      // "+", "Ook. Ook."
-        pub decrement: String,      // "-", "Ook! Ook!"
-        pub set: String,            // ",", "Ook. Ook!"
-        pub print: String,          // ".", "Ook! Ook."
-        pub jump_forward: String,   // "[", "Ook! Ook?"
-        pub jump_back: String,      // "]", "Ook? Ook!"
+        pub advance: &'a String,      // ">", "Ook. Ook?"
+        pub devance: &'a String,      // "<", "Ook? Ook."
+        pub increment: &'a String,    // "+", "Ook. Ook."
+        pub decrement: &'a String,    // "-", "Ook! Ook!"
+        pub set: &'a String,          // ",", "Ook. Ook!"
+        pub print: &'a String,        // ".", "Ook! Ook."
+        pub jump_forward: &'a String, // "[", "Ook! Ook?"
+        pub jump_back: &'a String,    // "]", "Ook? Ook!"
     }
 }
 
@@ -65,31 +65,31 @@ impl Tape {
     }
 }
 
-fn mainloop(parsed: parser::Parsed) {
+fn mainloop(token_set: &parser::TokenSet, parsed: parser::Parsed) {
     let mut pc: u64 = 0;
     let mut tape = Tape::new();
 
     while pc < parsed.tokens.len() as u64 {
         let token = &parsed.tokens[pc as usize];
 
-        if token.eq("Ook. Ook?") {
+        if token.eq(token_set.advance) {
             tape.advance();
-        } else if token.eq("Ook? Ook.") {
+        } else if token.eq(token_set.devance) {
             tape.devance();
-        } else if token.eq("Ook. Ook.") {
+        } else if token.eq(token_set.increment) {
             tape.inc();
-        } else if token.eq("Ook! Ook!") {
+        } else if token.eq(token_set.decrement) {
             tape.dec();
-        } else if token.eq("Ook! Ook.") {
+        } else if token.eq(token_set.print) {
             // print
             print!("{}", (tape.get() as u8) as char);
-        } else if token.eq("Ook. Ook!") {
+        } else if token.eq(token_set.set) {
             let mut buffer = String::new();
             let _ = io::stdin().read_to_string(&mut buffer);
             tape.set(buffer.parse::<i64>().unwrap());
-        } else if token.eq("Ook! Ook?") && tape.get() == 0 {
+        } else if token.eq(token_set.jump_forward) && tape.get() == 0 {
             pc = parsed.bracket_map[&pc];
-        } else if token.eq("Ook? Ook!") && tape.get() != 0 {
+        } else if token.eq(token_set.jump_back) && tape.get() != 0 {
             pc = parsed.bracket_map[&pc];
         }
         pc += 1;
@@ -110,7 +110,7 @@ fn split(program: String) -> Vec<String> {
     return tokens;
 }
 
-fn parse(token_set: parser::TokenSet, program: String) -> parser::Parsed {
+fn parse(token_set: &parser::TokenSet, program: String) -> parser::Parsed {
     let tokens = split(program);
 
     let mut parsed: Vec<String> = vec![];
@@ -120,24 +120,14 @@ fn parse(token_set: parser::TokenSet, program: String) -> parser::Parsed {
     let mut pc: u64 = 0;
 
     let instructions: HashSet<&str> = [
-        //     token_set.advance,
-        //     token_set.devance,
-        //     token_set.increment,
-        //     token_set.decrement,
-        //     token_set.set,
-        //     token_set.print,
-        //     token_set.jump_forward,
-        //     token_set.jump_back,
-        //"Ook. Ook?",
-        //"Ook? Ook.",
-        "Ook. Ook.",
-        "Ook! Ook!",
-        "Ook. Ook!",
-        "Ook! Ook.",
-        "Ook! Ook?",
-        "Ook? Ook!",
-        token_set.advance,
-        token_set.devance,
+        token_set.advance.as_str(),
+        token_set.devance.as_str(),
+        token_set.increment.as_str(),
+        token_set.decrement.as_str(),
+        token_set.set.as_str(),
+        token_set.print.as_str(),
+        token_set.jump_forward.as_str(),
+        token_set.jump_back.as_str(),
     ]
     .iter()
     .cloned()
@@ -147,9 +137,9 @@ fn parse(token_set: parser::TokenSet, program: String) -> parser::Parsed {
         if instructions.contains(token.as_str()) {
             parsed.push(token.to_string());
 
-            if token.eq("Ook! Ook?") {
+            if token.eq(token_set.jump_forward) {
                 leftstack.push(pc);
-            } else if token.eq("Ook? Ook!") {
+            } else if token.eq(token_set.jump_back) {
                 let left = match leftstack.pop() {
                     Some(number) => number,
                     None => 0,
@@ -175,19 +165,19 @@ fn run(mut file: &File) {
     let token_set = parser::TokenSet {
         advance: &String::from("Ook. Ook?"),
         devance: &String::from("Ook? Ook."),
-        increment: String::from("Ook. Ook."),
-        decrement: String::from("Ook! Ook!"),
-        set: String::from("Ook. Ook!"),
-        print: String::from("Ook! Ook."),
-        jump_forward: String::from("Ook! Ook?"),
-        jump_back: String::from("Ook? Ook!"),
+        increment: &String::from("Ook. Ook."),
+        decrement: &String::from("Ook! Ook!"),
+        set: &String::from("Ook. Ook!"),
+        print: &String::from("Ook! Ook."),
+        jump_forward: &String::from("Ook! Ook?"),
+        jump_back: &String::from("Ook? Ook!"),
     };
     match res {
         Err(e) => println!("{:?}", e),
         _ => (),
     }
-    let parsed = parse(token_set, contents);
-    mainloop(parsed);
+    let parsed = parse(&token_set, contents);
+    mainloop(&token_set, parsed);
 }
 
 fn entry_point(args: Vec<String>) -> std::io::Result<()> {
