@@ -102,9 +102,10 @@ fn split(program: String) -> Vec<String> {
     let length = fragments.len() / 2;
     for n in 0..length {
         let mut s = String::new();
-        s.push_str(&fragments[n * 2]);
+        let base = n * 2;
+        s.push_str(&fragments[base]);
         s.push(' ');
-        s.push_str(&fragments[n * 2 + 1]);
+        s.push_str(&fragments[base + 1]);
         tokens.push(s);
     }
     return tokens;
