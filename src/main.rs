@@ -96,9 +96,9 @@ fn mainloop(token_set: &parser::TokenSet, parsed: parser::Parsed) {
     }
 }
 
-fn split(program: String) -> Vec<String> {
+fn split(token_delimiter: &str, program: String) -> Vec<String> {
     let mut tokens: Vec<String> = vec![];
-    let fragments: Vec<String> = program.split(" ").map(|s| s.to_string()).collect();
+    let fragments: Vec<String> = program.split(&token_delimiter).map(|s| s.to_string()).collect();
     let length = fragments.len() / 2;
     for n in 0..length {
         let mut s = String::new();
@@ -111,8 +111,8 @@ fn split(program: String) -> Vec<String> {
     return tokens;
 }
 
-fn parse(token_set: &parser::TokenSet, program: String) -> parser::Parsed {
-    let tokens = split(program);
+fn parse(token_set: &parser::TokenSet, token_delimiter: &str, program: String) -> parser::Parsed {
+    let tokens = split(token_delimiter, program);
 
     let mut parsed: Vec<String> = vec![];
     let mut bracket_map: HashMap<u64, u64> = HashMap::new();
@@ -163,6 +163,7 @@ fn parse(token_set: &parser::TokenSet, program: String) -> parser::Parsed {
 fn run(mut file: &File) {
     let mut contents = String::new();
     let res = file.read_to_string(&mut contents);
+    let token_delimiter = " ";
     let token_set = parser::TokenSet {
         advance: &String::from("Ook. Ook?"),
         devance: &String::from("Ook? Ook."),
@@ -177,7 +178,7 @@ fn run(mut file: &File) {
         Err(e) => println!("{:?}", e),
         _ => (),
     }
-    let parsed = parse(&token_set, contents);
+    let parsed = parse(&token_set, &token_delimiter, contents);
     mainloop(&token_set, parsed);
 }
 
