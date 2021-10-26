@@ -162,8 +162,8 @@ fn parse(token_set: &parser::TokenSet, program: String) -> parser::Parsed {
 }
 
 fn run(mut file: &File) {
-    let mut contents = String::new();
-    let res = file.read_to_string(&mut contents);
+    let mut program_contents = String::new();
+    let res = file.read_to_string(&mut program_contents);
     let token_set = parser::TokenSet {
         delimiter: &String::from(" "),
         advance: &String::from("Ook. Ook?"),
@@ -179,7 +179,7 @@ fn run(mut file: &File) {
         Err(e) => println!("{:?}", e),
         _ => (),
     }
-    let parsed = parse(&token_set, contents);
+    let parsed = parse(&token_set, program_contents);
     mainloop(&token_set, parsed);
 }
 
