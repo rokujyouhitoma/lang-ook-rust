@@ -13,7 +13,7 @@ mod parser {
     }
 
     pub struct TokenSet<'a> {
-        pub delimiter: &'a String,     // "", " "
+        pub delimiter: &'a String,    // "", " "
         pub advance: &'a String,      // ">", "Ook. Ook?"
         pub devance: &'a String,      // "<", "Ook? Ook."
         pub increment: &'a String,    // "+", "Ook. Ook."
@@ -99,7 +99,10 @@ fn mainloop(token_set: &parser::TokenSet, parsed: parser::Parsed) {
 
 fn split(token_delimiter: &str, program: String) -> Vec<String> {
     let mut tokens: Vec<String> = vec![];
-    let fragments: Vec<String> = program.split(&token_delimiter).map(|s| s.to_string()).collect();
+    let fragments: Vec<String> = program
+        .split(&token_delimiter)
+        .map(|s| s.to_string())
+        .collect();
     let length = fragments.len() / 2;
     for n in 0..length {
         let mut s = String::new();
@@ -184,8 +187,12 @@ fn run(mut file: &File) {
 }
 
 fn entry_point(args: Vec<String>) -> std::io::Result<()> {
+    if args.len() > 2 {
+        println!("Too many arguments.");
+        std::process::exit(1);
+    }
     if args.len() < 2 {
-        println!("You must supply a filename");
+        println!("You must supply a filename.");
         std::process::exit(1);
     }
     let filename: &String = &args[1];
